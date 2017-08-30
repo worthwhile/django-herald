@@ -4,15 +4,18 @@ Base notification classes
 
 import json
 from email.mime.base import MIMEBase
+from mimetypes import guess_type
 
 import jsonpickle
 import six
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.core.files import File
 
 from .models import SentNotification
 
@@ -76,11 +79,28 @@ class NotificationBase(object):
             subject=subject,
             extra_data=json.dumps(extra_data) if extra_data else None,
             notification_class='{}.{}'.format(self.__class__.__module__, self.__class__.__name__),
+            attachments=self._get_encoded_attachments(),
             user=user,
-            attachments=jsonpickle.dumps(self.get_attachments()),
         )
 
         return self.resend(sent_notification, raise_exception=raise_exception)
+
+    def _get_encoded_attachments(self):
+        attachments = self.get_attachments()
+
+        if attachments:
+            new_attachments = []
+
+            for attachment in attachments:
+                if isinstance(attachment, File):
+                    attachment.seek(0)
+                    new_attachments.append((attachment.name, attachment.read(), guess_type(attachment.name)[0]))
+                else:
+                    new_attachments.append(attachment)
+
+            attachments = new_attachments
+
+        return jsonpickle.dumps(attachments)
 
     def get_recipients(self):
         """
@@ -113,8 +133,8 @@ class NotificationBase(object):
 
     def get_attachments(self):
         """
-        Return a list of attachments or None.    
-        
+        Return a list of attachments or None.
+
         This only works with email.
         """
         return None
@@ -253,7 +273,7 @@ class EmailNotification(NotificationBase):
 
     def get_attachments(self):
         """
-        Return a list of attachments or None.    
+        Return a list of attachments or None.
 
         This only works with email.
         """
@@ -279,19 +299,18 @@ class EmailNotification(NotificationBase):
         if html_content:
             mail.attach_alternative(html_content, 'text/html')
 
-        if attachments:
-            for attachment in attachments:
-                # All mimebase attachments must have a Content-ID or Content-Disposition header
-                # or they will show up as unnamed attachments"
-                if isinstance(attachment, MIMEBase):
-                    if attachment.get('Content-ID',False):
-                        # if you are sending attachment with content id,
-                        # subtype must be 'related'.
-                        mail.mixed_subtype = 'related'
+        for attachment in (attachments or []):
+            # All mimebase attachments must have a Content-ID or Content-Disposition header
+            # or they will show up as unnamed attachments"
+            if isinstance(attachment, MIMEBase):
+                if attachment.get('Content-ID', False):
+                    # if you are sending attachment with content id,
+                    # subtype must be 'related'.
+                    mail.mixed_subtype = 'related'
 
-                    mail.attach(attachment)
-                else:
-                    mail.attach(*attachment)
+                mail.attach(attachment)
+            else:
+                mail.attach(*attachment)
 
         mail.send()
 
