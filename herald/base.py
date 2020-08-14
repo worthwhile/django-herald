@@ -269,7 +269,7 @@ class EmailNotification(NotificationBase):
 
     def get_context_data(self):
         context = super(EmailNotification, self).get_context_data()
-        context['subject'] = self.subject
+        context['subject'] = self.get_subject()
         return context
 
     def get_recipients(self):
