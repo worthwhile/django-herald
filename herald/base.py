@@ -187,7 +187,7 @@ class NotificationBase(object):
         except TemplateDoesNotExist:
             content = None
 
-            if settings.DEBUG:
+            if settings.DEBUG or getattr(settings, 'HERALD_RAISE_MISSING_TEMPLATES', True):
                 raise
 
         return content
