@@ -6,7 +6,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.template import loader
-from django.utils.encoding import force_bytes, force_str
+from django.utils.encoding import force_bytes
+try:
+    from django.utils.encoding import force_str as force_text
+except ImportError:
+    from django.utils.encoding import force_text
+
 from django.utils.http import urlsafe_base64_encode
 from django.urls import reverse
 
@@ -45,7 +50,7 @@ class PasswordResetEmail(EmailNotification):
             self.domain = current_site.domain
 
         protocol = 'https' if self.use_https else 'http'
-        uid = force_str(urlsafe_base64_encode(force_bytes(self.user.pk)))
+        uid = force_text(urlsafe_base64_encode(force_bytes(self.user.pk)))
         token = self.token_generator.make_token(self.user)
 
         context.update({

@@ -4,7 +4,10 @@ Admin for notifications
 
 from functools import update_wrapper
 
-from django.urls import re_path
+try:
+    from django.urls import re_path as url
+except ImportError:
+    from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.options import csrf_protect_m
 from django.contrib.admin.utils import unquote
@@ -59,7 +62,7 @@ class SentNotificationAdmin(admin.ModelAdmin):
         info = opts.app_label, opts.model_name
 
         return [
-            re_path(r'^(.+)/resend/$', wrap(self.resend_view), name='%s_%s_resend' % info),
+            url(r'^(.+)/resend/$', wrap(self.resend_view), name='%s_%s_resend' % info),
         ] + urls
 
     @csrf_protect_m

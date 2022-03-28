@@ -2,11 +2,14 @@
 Urls for herald app
 """
 
-from django.urls import re_path
+try:
+    from django.urls import re_path as url
+except ImportError:
+    from django.conf.urls import url
 
 from .views import TestNotificationList, TestNotification
 
 urlpatterns = [
-    re_path(r'^$', TestNotificationList.as_view(), name='herald_preview_list'),
-    re_path(r'^(?P<index>\d+)/(?P<type>[\w\-]+)/$', TestNotification.as_view(), name='herald_preview'),
+    url(r'^$', TestNotificationList.as_view(), name='herald_preview_list'),
+    url(r'^(?P<index>\d+)/(?P<type>[\w\-]+)/$', TestNotification.as_view(), name='herald_preview'),
 ]
