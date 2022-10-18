@@ -41,7 +41,7 @@ class NotificationBase(object):
         context = self.context or {}
 
         site = Site.objects.get_current()
-        context['base_url'] = 'http://' + site.domain
+        context["base_url"] = "http://" + site.domain
 
         return context
 
@@ -51,14 +51,12 @@ class NotificationBase(object):
             return cls.verbose_name
         else:
             return re.sub(
-                r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))',
-                r' \1',
-                cls.__name__
+                r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))", r" \1", cls.__name__
             )
 
     @classmethod
     def get_class_path(cls):
-        return '{}.{}'.format(cls.__module__, cls.__name__)
+        return "{}.{}".format(cls.__module__, cls.__name__)
 
     def send(self, raise_exception=False, user=None):
         """
@@ -70,13 +68,13 @@ class NotificationBase(object):
 
         recipients = self.get_recipients()
 
-        if 'text' in self.render_types:
-            text_content = self.render('text', context)
+        if "text" in self.render_types:
+            text_content = self.render("text", context)
         else:
             text_content = None
 
-        if 'html' in self.render_types:
-            html_content = self.render('html', context)
+        if "html" in self.render_types:
+            html_content = self.render("html", context)
         else:
             html_content = None
 
@@ -85,7 +83,7 @@ class NotificationBase(object):
         extra_data = self.get_extra_data()
 
         sent_notification = SentNotification(
-            recipients=','.join(recipients),
+            recipients=",".join(recipients),
             text_content=text_content,
             html_content=html_content,
             sent_from=sent_from,
@@ -107,7 +105,9 @@ class NotificationBase(object):
             if isinstance(attachment, File):
                 # cannot do with attachment.open() since django 1.11 doesn't support that
                 attachment.open()
-                new_attachments.append((attachment.name, attachment.read(), guess_type(attachment.name)[0]))
+                new_attachments.append(
+                    (attachment.name, attachment.read(), guess_type(attachment.name)[0])
+                )
                 attachment.close()
             else:
                 new_attachments.append(attachment)
@@ -119,7 +119,7 @@ class NotificationBase(object):
         """
         This deletes any notifications that have passed the retention time setting
         """
-        retention_time = getattr(settings, 'HERALD_NOTIFICATION_RETENTION_TIME', None)
+        retention_time = getattr(settings, "HERALD_NOTIFICATION_RETENTION_TIME", None)
 
         if not retention_time:
             return
@@ -128,14 +128,14 @@ class NotificationBase(object):
 
         notifications = SentNotification.objects.filter(date_sent__lt=cutoff_date)
         count = notifications.delete()
-        print('Deleted {} expired notifications.'.format(count))
+        print("Deleted {} expired notifications.".format(count))
 
     def get_recipients(self):
         """
         Returns a list of recipients. However the subclass defines that. (emails, phone numbers, etc)
         """
 
-        raise NotImplementedError('Must implement get_recipients.')
+        raise NotImplementedError("Must implement get_recipients.")
 
     def get_extra_data(self):
         """
@@ -150,7 +150,7 @@ class NotificationBase(object):
         Returns a "sent from" string. However the subclass defines that. (email, phone number, etc)
         """
 
-        raise NotImplementedError('Must implement get_sent_from.')
+        raise NotImplementedError("Must implement get_sent_from.")
 
     def get_subject(self):
         """
@@ -176,18 +176,23 @@ class NotificationBase(object):
         :return: the rendered content
         """
 
-        assert render_type in self.render_types, 'Invalid Render Type'
+        assert render_type in self.render_types, "Invalid Render Type"
 
         try:
-            content = render_to_string('herald/{}/{}.{}'.format(
-                render_type,
-                self.template_name,
-                'txt' if render_type == 'text' else render_type
-            ), context)
+            content = render_to_string(
+                "herald/{}/{}.{}".format(
+                    render_type,
+                    self.template_name,
+                    "txt" if render_type == "text" else render_type,
+                ),
+                context,
+            )
         except TemplateDoesNotExist:
             content = None
 
-            if settings.DEBUG or getattr(settings, 'HERALD_RAISE_MISSING_TEMPLATES', True):
+            if settings.DEBUG or getattr(
+                settings, "HERALD_RAISE_MISSING_TEMPLATES", True
+            ):
                 raise
 
         return content
@@ -208,9 +213,11 @@ class NotificationBase(object):
         """
 
         # handle skipping a notification based on user preference
-        if hasattr(sent_notification.user, 'usernotification'):
+        if hasattr(sent_notification.user, "usernotification"):
             notifications = sent_notification.user.usernotification
-            if notifications.disabled_notifications.filter(notification_class=cls.get_class_path()).exists():
+            if notifications.disabled_notifications.filter(
+                notification_class=cls.get_class_path()
+            ).exists():
                 sent_notification.date_sent = timezone.now()
                 sent_notification.status = sent_notification.STATUS_USER_DISABLED
                 sent_notification.save()
@@ -243,13 +250,20 @@ class NotificationBase(object):
         return sent_notification.status == sent_notification.STATUS_SUCCESS
 
     @staticmethod
-    def _send(recipients, text_content=None, html_content=None, sent_from=None, subject=None, extra_data=None,
-              attachments=None):
+    def _send(
+        recipients,
+        text_content=None,
+        html_content=None,
+        sent_from=None,
+        subject=None,
+        extra_data=None,
+        attachments=None,
+    ):
         """
         Handles the actual sending of the notification. Sub classes must override this
         """
 
-        raise NotImplementedError('Must implement send.')
+        raise NotImplementedError("Must implement send.")
 
 
 class EmailNotification(NotificationBase):
@@ -257,7 +271,7 @@ class EmailNotification(NotificationBase):
     Base class for email notifications
     """
 
-    render_types = ['text', 'html']
+    render_types = ["text", "html"]
     from_email = None
     subject = None
     to_emails = None
@@ -269,7 +283,7 @@ class EmailNotification(NotificationBase):
 
     def get_context_data(self):
         context = super(EmailNotification, self).get_context_data()
-        context['subject'] = self.subject
+        context["subject"] = self.subject
         return context
 
     def get_recipients(self):
@@ -290,16 +304,16 @@ class EmailNotification(NotificationBase):
         extra_data = {}
 
         if self.bcc:
-            extra_data['bcc'] = self.bcc
+            extra_data["bcc"] = self.bcc
 
         if self.cc:
-            extra_data['cc'] = self.cc
+            extra_data["cc"] = self.cc
 
         if self.headers:
-            extra_data['headers'] = self.headers
+            extra_data["headers"] = self.headers
 
         if self.reply_to:
-            extra_data['reply_to'] = self.reply_to
+            extra_data["reply_to"] = self.reply_to
 
         return extra_data
 
@@ -312,16 +326,20 @@ class EmailNotification(NotificationBase):
         return self.attachments
 
     def render(self, render_type, context):
-        if render_type == 'text' and getattr(settings, 'HERALD_HTML2TEXT_ENABLED', False):
+        if render_type == "text" and getattr(
+            settings, "HERALD_HTML2TEXT_ENABLED", False
+        ):
             try:
-                content = super(EmailNotification, self).render('text', context)
+                content = super(EmailNotification, self).render("text", context)
 
             # Render plain text version from HTML
             except TemplateDoesNotExist:
                 content = None
 
             if content is None:
-                content = self.get_html2text_converter().handle(super(EmailNotification, self).render('html', context))
+                content = self.get_html2text_converter().handle(
+                    super(EmailNotification, self).render("html", context)
+                )
         else:
             content = super(EmailNotification, self).render(render_type, context)
 
@@ -338,15 +356,22 @@ class EmailNotification(NotificationBase):
 
         h = html2text.HTML2Text()
 
-        if hasattr(settings, 'HERALD_HTML2TEXT_CONFIG'):
+        if hasattr(settings, "HERALD_HTML2TEXT_CONFIG"):
             for k, v in settings.HERALD_HTML2TEXT_CONFIG.items():
                 setattr(h, k, v)
 
         return h
 
     @staticmethod
-    def _send(recipients, text_content=None, html_content=None, sent_from=None, subject=None, extra_data=None,
-              attachments=None):
+    def _send(
+        recipients,
+        text_content=None,
+        html_content=None,
+        sent_from=None,
+        subject=None,
+        extra_data=None,
+        attachments=None,
+    ):
 
         extra_data = extra_data or {}
 
@@ -355,23 +380,23 @@ class EmailNotification(NotificationBase):
             body=text_content,
             from_email=sent_from,
             to=recipients,
-            bcc=extra_data.get('bcc', None),
-            headers=extra_data.get('headers', None),
-            cc=extra_data.get('cc', None),
-            reply_to=extra_data.get('reply_to', None),
+            bcc=extra_data.get("bcc", None),
+            headers=extra_data.get("headers", None),
+            cc=extra_data.get("cc", None),
+            reply_to=extra_data.get("reply_to", None),
         )
 
         if html_content:
-            mail.attach_alternative(html_content, 'text/html')
+            mail.attach_alternative(html_content, "text/html")
 
-        for attachment in (attachments or []):
+        for attachment in attachments or []:
             # All mimebase attachments must have a Content-ID or Content-Disposition header
             # or they will show up as unnamed attachments"
             if isinstance(attachment, MIMEBase):
-                if attachment.get('Content-ID', False):
+                if attachment.get("Content-ID", False):
                     # if you are sending attachment with content id,
                     # subtype must be 'related'.
-                    mail.mixed_subtype = 'related'
+                    mail.mixed_subtype = "related"
 
                 mail.attach(attachment)
             else:
@@ -386,7 +411,7 @@ class TwilioTextNotification(NotificationBase):
     Uses twilio
     """
 
-    render_types = ['text']
+    render_types = ["text"]
     from_number = None
     to_number = None
 
@@ -400,14 +425,21 @@ class TwilioTextNotification(NotificationBase):
                 from_number = settings.TWILIO_DEFAULT_FROM_NUMBER
             except AttributeError:
                 raise Exception(
-                    'TWILIO_DEFAULT_FROM_NUMBER setting is required for sending a TwilioTextNotification'
+                    "TWILIO_DEFAULT_FROM_NUMBER setting is required for sending a TwilioTextNotification"
                 )
 
         return from_number
 
     @staticmethod
-    def _send(recipients, text_content=None, html_content=None, sent_from=None, subject=None, extra_data=None,
-              attachments=None):
+    def _send(
+        recipients,
+        text_content=None,
+        html_content=None,
+        sent_from=None,
+        subject=None,
+        extra_data=None,
+        attachments=None,
+    ):
         try:
             # twilio version 6
             from twilio.rest import Client

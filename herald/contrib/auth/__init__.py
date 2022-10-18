@@ -1,1 +1,1 @@
-default_app_config = 'herald.contrib.auth.apps.HeraldAuthConfig'
+default_app_config = "herald.contrib.auth.apps.HeraldAuthConfig"

@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('herald', '0001_initial'),
+        ("herald", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sentnotification',
-            name='attachments',
+            model_name="sentnotification",
+            name="attachments",
             field=models.TextField(blank=True, null=True),
         ),
     ]

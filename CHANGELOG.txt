@@ -1,7 +1,12 @@
 === TBD (TBD) ===
+
+
+=== 0.3.0 (10-18-2022) ===
 - Added support for automatic HTML2text support for plain text emails
 - Added auto-complete for user in admin
 - #74 - Added support for conditional enable/disable to raise error for missing templates `HERALD_RAISE_MISSING_TEMPLATES`
+- Updated to use GitHub Actions for CI
+- Switched to Black for code formatting
 
 
 === 0.2.1 (06-23-2019) ===

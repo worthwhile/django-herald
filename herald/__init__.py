@@ -1,9 +1,9 @@
 """
 Notification classes. Used for sending texts and emails
 """
-__version__ = '0.3.0'
+__version__ = "0.3.0"
 
-default_app_config = 'herald.apps.HeraldConfig'
+default_app_config = "herald.apps.HeraldConfig"
 
 
 class NotificationRegistry(object):
@@ -22,7 +22,7 @@ class NotificationRegistry(object):
         from .base import NotificationBase
 
         if not issubclass(kls, NotificationBase):
-            raise ValueError('Notification must subclass NotificationBase.')
+            raise ValueError("Notification must subclass NotificationBase.")
 
         self._registry.append(kls)
 
@@ -55,4 +55,4 @@ def autodiscover():
     """
     from django.utils.module_loading import autodiscover_modules
 
-    autodiscover_modules('notifications', register_to=registry)
+    autodiscover_modules("notifications", register_to=registry)

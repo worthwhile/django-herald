@@ -9,36 +9,71 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('auth', '0008_alter_user_username_max_length'),
+        ("auth", "0008_alter_user_username_max_length"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('herald', '0002_sentnotification_attachments'),
+        ("herald", "0002_sentnotification_attachments"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Notification',
+            name="Notification",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('notification_class', models.CharField(max_length=80, unique=True)),
-                ('verbose_name', models.CharField(blank=True, max_length=100, null=True)),
-                ('can_disable', models.BooleanField(default=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("notification_class", models.CharField(max_length=80, unique=True)),
+                (
+                    "verbose_name",
+                    models.CharField(blank=True, max_length=100, null=True),
+                ),
+                ("can_disable", models.BooleanField(default=True)),
             ],
         ),
         migrations.CreateModel(
-            name='UserNotification',
+            name="UserNotification",
             fields=[
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
-                ('disabled_notifications', models.ManyToManyField(to='herald.Notification')),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        serialize=False,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "disabled_notifications",
+                    models.ManyToManyField(to="herald.Notification"),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='sentnotification',
-            name='user',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL),
+            model_name="sentnotification",
+            name="user",
+            field=models.ForeignKey(
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='sentnotification',
-            name='status',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'Pending'), (1, 'Success'), (2, 'Failed'), (3, 'User Disabled')], default=0),
+            model_name="sentnotification",
+            name="status",
+            field=models.PositiveSmallIntegerField(
+                choices=[
+                    (0, "Pending"),
+                    (1, "Success"),
+                    (2, "Failed"),
+                    (3, "User Disabled"),
+                ],
+                default=0,
+            ),
         ),
     ]
