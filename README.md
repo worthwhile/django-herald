@@ -297,6 +297,12 @@ HERALD_HTML2TEXT_CONFIG = {
 }
 ```
 
+```
+HERALD_RAISE_MISSING_TEMPLATES = True
+```
+
+By default, Herald will raise an exception if a template is missing when true (default).
+
 ### Twilio
 
 ```
