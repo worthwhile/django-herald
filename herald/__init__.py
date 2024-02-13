@@ -1,9 +1,7 @@
 """
 Notification classes. Used for sending texts and emails
 """
-__version__ = "0.3.0"
-
-default_app_config = "herald.apps.HeraldConfig"
+__version__ = "0.3.1"
 
 
 class NotificationRegistry(object):

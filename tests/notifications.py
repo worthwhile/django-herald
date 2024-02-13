@@ -22,6 +22,8 @@ class MyNotification(EmailNotification):
 
         raw_data = "Some Report Data"
 
+        fp.close()
+
         return [
             ("Report.txt", raw_data, "text/plain"),
             img,
@@ -51,7 +53,8 @@ class MyNotificationAttachmentOpen(EmailNotification):
     def get_attachments(self):
         with open("tests/python.jpeg", "rb") as f:
             img = File(f)
-
-        img2 = File(open("tests/python.jpeg", "rb"))
+        
+        with open("tests/python.jpeg", "rb") as f:
+            img2 = File(f)
 
         return [img, img2]
