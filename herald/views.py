@@ -1,6 +1,7 @@
 """
 Views for testing notifications. Should not be present in production
 """
+
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.generic import TemplateView, View

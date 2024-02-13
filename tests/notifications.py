@@ -53,7 +53,7 @@ class MyNotificationAttachmentOpen(EmailNotification):
     def get_attachments(self):
         with open("tests/python.jpeg", "rb") as f:
             img = File(f)
-        
+
         with open("tests/python.jpeg", "rb") as f:
             img2 = File(f)
 
