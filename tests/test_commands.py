@@ -1,6 +1,7 @@
 """
 Testing custom commands
 """
+
 from datetime import timedelta, datetime
 
 from django.core.management import call_command
