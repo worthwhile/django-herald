@@ -1,3 +1,9 @@
+# NO LONGER MAINTAINED
+
+This repo is MIT, so feel free to fork. 
+
+Consider using this maintained alternative instead https://github.com/peterfarrell/django-heralder
+
 # django-herald
 
 [![Latest PyPI version](https://badge.fury.io/py/django-herald.svg)](https://pypi.python.org/pypi/django-herald)
