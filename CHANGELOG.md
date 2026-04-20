@@ -1,5 +1,8 @@
 ## TBD (TBD)
 
+## 0.3.1 (02-13-2024)
+- Fixed Django warning about default_app_config
+- Updated CI to test against latest LTS versions (3.2 & 4.2)
 
 ## 0.3.0 (10-18-2022)
 - Added support for automatic HTML2text support for plain text emails
